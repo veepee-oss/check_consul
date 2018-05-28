@@ -1,0 +1,91 @@
+---
+
+stages:
+  - linter
+  - build
+  - test
+  - deploy
+
+git-history:
+  stage: linter
+  script:
+    - >
+      bash <(curl -s
+      https://gitlab.com/yue-script/checks/raw/master/check_git_history.sh)
+
+lines-length:
+  stage: linter
+  script:
+    - >
+      bash <(curl -s
+      https://gitlab.com/yue-script/checks/raw/master/check_lines_length.sh)
+      80
+
+dockerlint:
+  stage: linter
+  image: vpgrp/linter:docker
+  script:
+    - dockerlint Dockerfile
+
+pylama:
+    stage: linter
+    image: vpgrp/linter:python
+    before_script:
+      - pip install consulate
+    script:
+      - pylama *.py
+
+docker-build:
+  stage: build
+  image: docker:latest
+  artifacts:
+    paths:
+      - image
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay
+  script:
+    - docker build -t registry.vpgrp.io/noc/monitoring-plugins/check_consul .
+    - mkdir image
+    - docker save registry.vpgrp.io/noc/monitoring-plugins/check_consul > image/check_consul.tar
+
+python2.7:
+  stage: test
+  image: vpgrp/python:2.7
+  before_script:
+    - python -m pip install consulate
+  script:
+    - python check_consul_service.py -t $CONSUL_TOKEN -H $CONSUL_HOST -p $CONSUL_PORT $CONSUL_SERVICE
+
+python3.5:
+  stage: test
+  image: vpgrp/python:3.5
+  before_script:
+    - python3 -m pip install consulate
+  script:
+    - python3 check_consul_service.py -t $CONSUL_TOKEN -H $CONSUL_HOST -p $CONSUL_PORT $CONSUL_SERVICE
+
+docker-run:
+  stage: test
+  image: docker:latest
+  before_script:
+    - docker load -i image/check_consul.tar
+  script:
+    - docker run -i registry.vpgrp.io/noc/monitoring-plugins/check_consul -t $CONSUL_TOKEN -H $CONSUL_HOST -p $CONSUL_PORT $CONSUL_SERVICE
+
+docker-push:
+  stage: deploy
+  image: docker:latest
+  only:
+    - master
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay
+  before_script:
+    - docker login registry.vpgrp.io -u gitlab-ci-token -p $CI_BUILD_TOKEN
+  script:
+    - docker load -i image/check_consul.tar
+    - docker push registry.vpgrp.io/noc/monitoring-plugins/check_consul
+# EOF
