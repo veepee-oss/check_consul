@@ -59,7 +59,7 @@ docker-run:
   before_script:
     - docker load -i image/check_consul.tar
   script:
-    - docker run -i registry.vpgrp.io/noc/monitoring-plugins/check_consul -c /project/check_consul_service.py -t $CONSUL_TOKEN -H $CONSUL_HOST -p $CONSUL_PORT $CONSUL_SERVICE
+    - docker run -i registry.vpgrp.io/noc/monitoring-plugins/check_consul -c /project/check_consul_service.py -t "$CONSUL_TOKEN" -H "$CONSUL_HOST" -p "$CONSUL_PORT" "$CONSUL_SERVICE"
 
 docker-push:
   stage: deploy
