@@ -6,21 +6,6 @@ stages:
   - test
   - deploy
 
-git-history:
-  stage: linter
-  script:
-    - >
-      bash <(curl -s
-      https://gitlab.com/yue-script/checks/raw/master/check_git_history.sh)
-
-lines-length:
-  stage: linter
-  script:
-    - >
-      bash <(curl -s
-      https://gitlab.com/yue-script/checks/raw/master/check_lines_length.sh)
-      80
-
 dockerlint:
   stage: linter
   image: vpgrp/linter:docker
