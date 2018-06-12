@@ -68,7 +68,7 @@ python3.5:
     - python3 check_consul_service.py -t $CONSUL_TOKEN -H $CONSUL_HOST -p $CONSUL_PORT $CONSUL_SERVICE
   allow_failure: true
 
-docker-exec:
+docker-run:
   stage: test
   image: docker:latest
   before_script:
