@@ -57,6 +57,7 @@ python2.7:
     - python -m pip install consulate
   script:
     - python check_consul_service.py -t $CONSUL_TOKEN -H $CONSUL_HOST -p $CONSUL_PORT $CONSUL_SERVICE
+  allow_failure: true
 
 python3.5:
   stage: test
@@ -65,14 +66,15 @@ python3.5:
     - python3 -m pip install consulate
   script:
     - python3 check_consul_service.py -t $CONSUL_TOKEN -H $CONSUL_HOST -p $CONSUL_PORT $CONSUL_SERVICE
+  allow_failure: true
 
-docker-run:
+docker-exec:
   stage: test
   image: docker:latest
   before_script:
     - docker load -i image/check_consul.tar
   script:
-    - docker run -i registry.vpgrp.io/noc/monitoring-plugins/check_consul -t $CONSUL_TOKEN -H $CONSUL_HOST -p $CONSUL_PORT $CONSUL_SERVICE
+    - docker run -i registry.vpgrp.io/noc/monitoring-plugins/check_consul -c /project/check_consul_service.py -t $CONSUL_TOKEN -H $CONSUL_HOST -p $CONSUL_PORT $CONSUL_SERVICE
 
 docker-push:
   stage: deploy
