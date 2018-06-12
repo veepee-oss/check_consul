@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """Icinga plugin for Comnsul service health."""
 import sys
 import argparse

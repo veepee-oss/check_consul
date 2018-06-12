@@ -8,4 +8,4 @@ WORKDIR /project
 
 COPY check_consul_service.py /project
 
-ENTRYPOINT [ "python3", "check_consul_service.py" ]
+ENTRYPOINT [ "/bin/sh" ]
