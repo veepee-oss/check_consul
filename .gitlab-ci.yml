@@ -35,7 +35,7 @@ docker-build:
     - mkdir image
     - docker save registry.vpgrp.io/noc/monitoring-plugins/check_consul > image/check_consul.tar
 
-python2.7:
+python-2.7:
   stage: test
   image: vpgrp/python:2.7
   before_script:
@@ -44,7 +44,7 @@ python2.7:
     - python check_consul_service.py -t $CONSUL_TOKEN -H $CONSUL_HOST -p $CONSUL_PORT $CONSUL_SERVICE
   allow_failure: true
 
-python3.5:
+python-3.5:
   stage: test
   image: vpgrp/python:3.5
   before_script:
